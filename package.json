@@ -1,0 +1,49 @@
+{
+  "name": "tree-sitter-mojo",
+  "description": "Mojo grammar for tree-sitter",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "nijaru",
+  "repository": "https://github.com/nijaru/zed-mojo",
+  "main": "bindings/node",
+  "types": "bindings/node",
+  "keywords": [
+    "incremental",
+    "parsing", 
+    "tree-sitter",
+    "mojo"
+  ],
+  "files": [
+    "grammar.js",
+    "binding.gyp",
+    "bindings/node/*",
+    "queries/*",
+    "src/**"
+  ],
+  "dependencies": {
+    "node-addon-api": "^8.2.1",
+    "node-gyp-build": "^4.8.2"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "^0.24.3"
+  },
+  "scripts": {
+    "install": "node-gyp-build",
+    "test": "tree-sitter test",
+    "parse": "tree-sitter parse",
+    "build": "tree-sitter generate && node-gyp build"
+  },
+  "tree-sitter": [
+    {
+      "scope": "source.mojo",
+      "file-types": [
+        "mojo",
+        "🔥"
+      ],
+      "injection-regex": "mojo",
+      "highlights": "queries/highlights.scm",
+      "tags": "queries/tags.scm",
+      "indents": "queries/indents.scm"
+    }
+  ]
+}
