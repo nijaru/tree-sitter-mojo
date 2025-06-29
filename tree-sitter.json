@@ -1,0 +1,8 @@
+{
+  "abi_version": 15,
+  "language": "mojo",
+  "metadata": {
+    "name": "mojo",
+    "version": "0.1.0"
+  }
+}
