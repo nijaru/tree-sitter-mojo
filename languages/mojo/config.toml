@@ -1,0 +1,26 @@
+name = "Mojo"
+grammar = "mojo"
+path_suffixes = ["mojo", "🔥"]
+language_servers = ["mojo-lsp"]
+scope = "source.mojo"
+
+[comments]
+line_comment = "#"
+
+[brackets]
+"(" = ")"
+"[" = "]"
+"{" = "}"
+
+[autoclose]
+"(" = ")"
+"[" = "]"
+"{" = "}"
+"\"" = "\""
+"'" = "'"
+
+[indent]
+unit = "    "
+
+[prettier]
+allowed = false

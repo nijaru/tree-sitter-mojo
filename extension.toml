@@ -1,0 +1,15 @@
+id = "mojo"
+name = "Mojo"
+description = "Modern Mojo language support with v25.4+ syntax"
+version = "0.1.0"
+schema_version = 1
+authors = ["nijaru"]
+repository = "https://github.com/nijaru/zed-mojo"
+
+[grammars.mojo]
+repository = "https://github.com/nijaru/zed-mojo"
+commit = "main"
+
+[language_servers.mojo-lsp]
+name = "mojo-lsp"
+language = "Mojo"
