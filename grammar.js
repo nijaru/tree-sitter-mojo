@@ -6,6 +6,12 @@
 
 module.exports = grammar({
   name: "mojo",
+  
+  precedences: () => [
+    [
+      'binary_op',
+    ]
+  ],
 
   extras: ($) => [
     $.comment,
@@ -38,14 +44,23 @@ module.exports = grammar({
 
     _simple_statement: ($) => choice(
       $.import_statement,
+      $.from_import_statement,
       $.expression_statement,
       $.assignment_statement,
+      $.variable_declaration,
       $.return_statement,
       $.pass_statement,
+      $.alias_statement,
     ),
 
     import_statement: ($) => 
       seq("import", $.identifier),
+      
+    from_import_statement: ($) =>
+      seq("from", $.identifier, "import", $.identifier),
+
+    alias_statement: ($) =>
+      seq("alias", $.identifier, "=", $.expression),
 
     expression_statement: ($) => $.expression,
 
@@ -58,6 +73,14 @@ module.exports = grammar({
         $.expression,
       ),
 
+    variable_declaration: ($) =>
+      seq(
+        "var",
+        $.identifier,
+        ":",
+        $.identifier,
+      ),
+
     return_statement: ($) => 
       seq("return", optional($.expression)),
 
@@ -66,13 +89,14 @@ module.exports = grammar({
     _compound_statement: ($) => choice(
       $.function_definition,
       $.struct_definition,
+      $.trait_definition,
       $.if_statement,
     ),
 
     function_definition: ($) => 
       seq(
         choice("def", "fn"),
-        $.identifier,
+        field("name", $.identifier),
         $.parameter_list,
         optional(seq("->", $.identifier)),
         ":",
@@ -104,7 +128,15 @@ module.exports = grammar({
     struct_definition: ($) => 
       seq(
         "struct",
-        $.identifier,
+        field("name", $.identifier),
+        ":",
+        $._suite,
+      ),
+
+    trait_definition: ($) => 
+      seq(
+        "trait",
+        field("name", $.identifier),
         ":",
         $._suite,
       ),
@@ -126,17 +158,31 @@ module.exports = grammar({
       seq(repeat($._statement), $._dedent),
 
     expression: ($) => choice(
+      $.binary_operator,
       $.call,
       $.attribute,
       $.identifier,
       $.integer,
+      $.float,
       $.string,
       $.boolean,
+      $.parenthesized_expression,
     ),
+
+    binary_operator: ($) => prec.left('binary_op', choice(
+      seq($.expression, "+", $.expression),
+      seq($.expression, "-", $.expression),
+      seq($.expression, "*", $.expression),
+      seq($.expression, "**", $.expression),
+      seq($.expression, "/", $.expression),
+    )),
+
+    parenthesized_expression: ($) =>
+      seq("(", $.expression, ")"),
 
     call: ($) => 
       seq(
-        $.identifier,
+        field("function", $.identifier),
         $.argument_list,
       ),
 
@@ -152,6 +198,8 @@ module.exports = grammar({
 
     integer: (_) => /\d+/,
     
+    float: (_) => /\d+\.\d+/,
+    
     string: (_) => choice(
       /"([^"\\]|\\.)*"/,
       /'([^'\\]|\\.)*'/,
@@ -159,7 +207,7 @@ module.exports = grammar({
     
     boolean: (_) => choice("True", "False"),
 
-    identifier: (_) => /[a-zA-Z_][a-zA-Z0-9_]*/,
+    identifier: (_) => /[a-zA-Z_][a-zA-Z0-9_]*|__[a-zA-Z_][a-zA-Z0-9_]*__/,
 
     comment: (_) => /#.*/,
   },

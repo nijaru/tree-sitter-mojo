@@ -5,7 +5,7 @@ struct MojoExtension {
 }
 
 impl MojoExtension {
-    fn language_server_binary_path(&mut self, config: zed::LanguageServerConfig) -> Result<String> {
+    fn language_server_binary_path(&mut self, language_server_id: &zed::LanguageServerId) -> Result<String> {
         if let Some(path) = &self.cached_binary_path {
             if let Ok(stat) = std::fs::metadata(path) {
                 if stat.is_file() {
@@ -15,7 +15,7 @@ impl MojoExtension {
         }
 
         zed::set_language_server_installation_status(
-            &config.name,
+            language_server_id,
             &zed::LanguageServerInstallationStatus::CheckingForUpdate,
         );
 
@@ -29,10 +29,10 @@ impl MojoExtension {
 
         let (platform, arch) = zed::current_platform();
         let asset_name = format!(
-            "magic-{}-{}.{}",
+            "magic-{:?}-{:?}.{}",
             arch,
             platform,
-            if platform == "windows" { "exe" } else { "tar.gz" }
+            if matches!(platform, zed::Os::Windows) { "exe" } else { "tar.gz" }
         );
 
         let asset = release
@@ -46,7 +46,7 @@ impl MojoExtension {
 
         if !std::fs::metadata(&binary_path).map_or(false, |stat| stat.is_file()) {
             zed::set_language_server_installation_status(
-                &config.name,
+                language_server_id,
                 &zed::LanguageServerInstallationStatus::Downloading,
             );
 
@@ -81,10 +81,10 @@ impl zed::Extension for MojoExtension {
 
     fn language_server_command(
         &mut self,
-        config: zed::LanguageServerConfig,
+        language_server_id: &zed::LanguageServerId,
         _worktree: &zed::Worktree,
     ) -> Result<zed::Command> {
-        let magic_path = self.language_server_binary_path(config)?;
+        let magic_path = self.language_server_binary_path(language_server_id)?;
         
         Ok(zed::Command {
             command: magic_path,

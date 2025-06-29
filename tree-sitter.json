@@ -4,5 +4,12 @@
   "metadata": {
     "name": "mojo",
     "version": "0.1.0"
-  }
+  },
+  "grammars": [
+    {
+      "name": "mojo",
+      "path": ".",
+      "scope": "source.mojo"
+    }
+  ]
 }
